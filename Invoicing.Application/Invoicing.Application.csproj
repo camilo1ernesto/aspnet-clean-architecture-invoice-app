@@ -14,4 +14,8 @@
       <ProjectReference Include="..\Invoicing.Domain\Invoicing.Domain.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <InternalsVisibleTo Include="Invoicing.Application.Tests" />
+    </ItemGroup>
+
 </Project>

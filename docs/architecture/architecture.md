@@ -227,7 +227,7 @@ to enforce it.
 
 Implicit decisions in the current code that should be captured as initial ADRs:
 
-1. Clean Architecture layering and dependency rules (this document).
+1. Clean Architecture layering and dependency rules (this document) — [ADR-001](adr/ADR-001-clean-architecture-boundaries.md).
 2. MediatR for use-case dispatch and command/query separation.
 3. Repository + Unit of Work, with `ApplicationDbContext` as the unit of work.
 4. EF Core InMemory as a temporary persistence provider; schema created and seeded at startup.
@@ -236,8 +236,12 @@ Implicit decisions in the current code that should be captured as initial ADRs:
 7. Invoice lifecycle (`InvoiceStatus`) and allowed transitions.
 8. Money representation (`decimal`, no currency, no rounding policy) and integer quantities.
 9. Payment-terms policy (due date = sent + 1 month).
-10. Error-handling convention between Domain/Application and the API.
+10. Error-handling convention between Domain/Application and the API — [ADR-003](adr/ADR-003-error-handling.md).
 11. Time convention (UTC) and source of current time.
+
+Further ADRs:
+
+- [ADR-002](adr/ADR-002-test-tooling.md) — Test tooling.
 
 ## 10. Known deviations from the intended architecture
 
@@ -248,17 +252,19 @@ Recorded at baseline. Each should be resolved or covered by an ADR.
 | API-6, BND-3 | `mediator.Send` is not awaited in `POST /invoices`; the response contains a `Task`, not the ID, and the use case runs after the response is returned. | `Invoicing.Api/Invoices/InvoiceApi.cs` |
 | API-4, APP-4 | Api constructs `InvoiceItem` domain entities; `CreateInvoiceCommand` takes `List<InvoiceItem>`. | `InvoiceApi.cs`, `CreateInvoiceCommand.cs` |
 | INF-5, PER-3 | `IUnitOfWork` is registered as a separate `ApplicationDbContext` instance from the one repositories use. | `Invoicing.Infrastructure/DependencyInjection.cs` |
-| DOM-2, DOM-5 | `Invoice.Customer`, `Status`, `Items` and all `InvoiceItem` properties are publicly settable; `Items` is a mutable `List`. | `Invoice.cs`, `InvoiceItem.cs` |
-| DOM-3 | No invariants enforced (empty items, non-positive quantity, negative price). | `Invoice.cs`, `InvoiceItem.cs` |
-| DOM-2 | Status transitions have no preconditions; `Overdue` is never assigned. | `Invoice.cs` |
+| DOM-2, DOM-5 | `Invoice.Customer`, `Items` and all `InvoiceItem` properties are publicly settable; `Items` is a mutable `List`. (`Status` is private and `Payments` is read-only since SPEC-001.) | `Invoice.cs`, `InvoiceItem.cs` |
+| DOM-3 | No invariants enforced on invoice creation (empty items, non-positive quantity, negative price). | `Invoice.cs`, `InvoiceItem.cs` |
+| DOM-2 | `MarkAsSent` has no preconditions; `Overdue` is never assigned. (`Paid` is reached only through `RegisterPayment` since SPEC-001.) | `Invoice.cs` |
 | DOM-6 | `Invoice` references the `Customer` object rather than its identity. | `Invoice.cs` |
-| API-7, BND-5 | Missing customer raises `ArgumentException`; no consistent error translation. | `CreateInvoiceCommandHandler.cs` |
-| APP-7 | Repository ports do not accept `CancellationToken`. | `ICustomerRepository.cs`, `IInvoiceRepository.cs` |
+| API-7, BND-5 | Create-invoice raises `ArgumentException` for a missing customer, outside the ADR-003 convention (would surface as 500). | `CreateInvoiceCommandHandler.cs` |
+| APP-7 | `ICustomerRepository` methods and `IInvoiceRepository.GetAllAsync` do not accept `CancellationToken`. | `ICustomerRepository.cs`, `IInvoiceRepository.cs` |
+| PER-6 | Payment reference uniqueness relies on the use-case check; the unique index on `Payment.Reference` is not enforced by EF Core InMemory, so concurrent requests can race. Concurrent payments can also exceed the balance (no concurrency control). | `RegisterPaymentCommandHandler.cs`, `InvoiceConfiguration.cs` |
 | PER-5 | Read-only invoice query uses tracking. | `InvoiceRepository.cs` |
 | BND-3 | No `GET /invoices/{id}` resource for the `Created` location. | `InvoiceApi.cs` |
 | DEP-3 | Several namespaces don't match their folders (for example `Invoicing.Application`, `Invoicing.Infrastructure` at the root). | `Application/Common/Abstractions/*`, `Application/Invoices/CreateInvoice/*`, `Infrastructure/Data/*` |
-| TST-6 | Domain reads `DateTime.UtcNow` directly. | `Invoice.cs` |
-| TST-1…5 | No automated tests exist. | — |
+| TST-6 | `DateTime.UtcNow` is read directly (Domain for creation/sending; the payment handler for `ReceivedAt`). | `Invoice.cs`, `RegisterPaymentCommandHandler.cs` |
+| TST-1…4 | Tests exist only for SPEC-001 (Register Payment); existing use cases (create invoice, list invoices, list customers) are untested. | — |
+| TST-5 | No automated architecture (dependency-rule) tests. | — |
 
 ## 11. Dependency diagram
 

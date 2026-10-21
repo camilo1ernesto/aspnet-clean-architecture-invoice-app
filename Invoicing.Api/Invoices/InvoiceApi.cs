@@ -1,5 +1,6 @@
 using Invoicing.Application;
 using Invoicing.Application.Invoices.GetInvoices;
+using Invoicing.Application.Invoices.RegisterPayment;
 using Invoicing.Domain.Invoices;
 using MediatR;
 
@@ -28,5 +29,13 @@ public static class InvoiceApi
             var invoices = await mediator.Send(new GetInvoicesQuery());
             return TypedResults.Ok(invoices);
         }).WithName("GetInvoices");
+
+        app.MapPost("/invoices/{invoiceId:guid}/payments", async (
+            Guid invoiceId, RegisterPaymentRequest request, IMediator mediator, CancellationToken cancellationToken) =>
+        {
+            var command = new RegisterPaymentCommand(invoiceId, request.Amount, request.Reference);
+            var payment = await mediator.Send(command, cancellationToken);
+            return TypedResults.Created(default(string), payment);
+        }).WithName("RegisterPayment");
     }
 }

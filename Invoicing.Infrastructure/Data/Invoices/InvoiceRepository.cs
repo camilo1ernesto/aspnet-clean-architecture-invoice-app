@@ -17,5 +17,15 @@ internal class InvoiceRepository(ApplicationDbContext dbContext)
             .Include(i => i.Items)
             .ToListAsync();
 
+    public async Task<Invoice?> GetByIdAsync(Guid invoiceId, CancellationToken cancellationToken) =>
+        await dbContext.Invoices
+            .Include(i => i.Items)
+            .Include(i => i.Payments)
+            .FirstOrDefaultAsync(i => i.Id == invoiceId, cancellationToken);
+
+    public async Task<bool> PaymentReferenceExistsAsync(string reference, CancellationToken cancellationToken) =>
+        await dbContext.Set<Payment>()
+            .AnyAsync(p => p.Reference == reference, cancellationToken);
+
     public IUnitOfWork UnitOfWork => dbContext;
 }
