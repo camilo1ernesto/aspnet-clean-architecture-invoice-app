@@ -14,6 +14,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Invoicing.Application.Tests
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Invoicing.Api.IntegrationTests", "Invoicing.Api.IntegrationTests\Invoicing.Api.IntegrationTests.csproj", "{B11949BC-DB1B-4C83-913A-68FE396F2432}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Invoicing.ArchitectureTests", "Invoicing.ArchitectureTests\Invoicing.ArchitectureTests.csproj", "{2CA5458C-EEF9-4528-88AA-E3955705B240}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -108,6 +110,18 @@ Global
 		{B11949BC-DB1B-4C83-913A-68FE396F2432}.Release|x64.Build.0 = Release|Any CPU
 		{B11949BC-DB1B-4C83-913A-68FE396F2432}.Release|x86.ActiveCfg = Release|Any CPU
 		{B11949BC-DB1B-4C83-913A-68FE396F2432}.Release|x86.Build.0 = Release|Any CPU
+		{2CA5458C-EEF9-4528-88AA-E3955705B240}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2CA5458C-EEF9-4528-88AA-E3955705B240}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2CA5458C-EEF9-4528-88AA-E3955705B240}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{2CA5458C-EEF9-4528-88AA-E3955705B240}.Debug|x64.Build.0 = Debug|Any CPU
+		{2CA5458C-EEF9-4528-88AA-E3955705B240}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{2CA5458C-EEF9-4528-88AA-E3955705B240}.Debug|x86.Build.0 = Debug|Any CPU
+		{2CA5458C-EEF9-4528-88AA-E3955705B240}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2CA5458C-EEF9-4528-88AA-E3955705B240}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2CA5458C-EEF9-4528-88AA-E3955705B240}.Release|x64.ActiveCfg = Release|Any CPU
+		{2CA5458C-EEF9-4528-88AA-E3955705B240}.Release|x64.Build.0 = Release|Any CPU
+		{2CA5458C-EEF9-4528-88AA-E3955705B240}.Release|x86.ActiveCfg = Release|Any CPU
+		{2CA5458C-EEF9-4528-88AA-E3955705B240}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

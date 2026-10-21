@@ -85,7 +85,7 @@ supersedes or amends this one.
 
   Until automated checks exist, these depend on review discipline.
 - **Existing deviations must be corrected.** The current code doesn't fully conform
-  (see `architecture.md` §10). Bringing it into line is additional work, and deviations
+  (see `architecture.md` §10). Bringing it   into line is additional work, and deviations
   that remain could be copied as precedent.
 - **Architecture tests have a cost.** Adding automated checks later requires choosing a test
   approach and maintaining the tests as the structure evolves.
