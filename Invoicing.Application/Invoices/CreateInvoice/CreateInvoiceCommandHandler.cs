@@ -15,7 +15,9 @@ internal class CreateInvoiceCommandHandler(
         var customer = await customerRepository.GetByIdAsync(request.CustomerId);
         if(customer == null) throw new ArgumentException(nameof(request.CustomerId));
 
-        var invoice = Invoice.CreateNew(customer, request.Items);
+        var lines = request.Items.Select(i => new InvoiceLine(i.Description, i.Quantity, i.UnitPrice));
+
+        var invoice = Invoice.CreateNew(customer, lines);
         invoiceRepository.Add(invoice);
         
         await invoiceRepository.UnitOfWork.CommitAsync(cancellationToken);

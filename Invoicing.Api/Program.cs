@@ -1,5 +1,6 @@
 using Invoicing.Api;
 using Invoicing.Api.Customer;
+using Invoicing.Api.ErrorHandling;
 using Invoicing.Api.Invoices;
 using Invoicing.Application;
 using Invoicing.Infrastructure;
@@ -13,8 +14,12 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure();
+builder.Services.AddProblemDetails();
+builder.Services.AddExceptionHandler<ApplicationExceptionHandler>();
 
 var app = builder.Build();
+
+app.UseExceptionHandler();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -35,3 +40,6 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.Run();
+
+// Exposes the entry point to WebApplicationFactory in the integration tests.
+public partial class Program;
