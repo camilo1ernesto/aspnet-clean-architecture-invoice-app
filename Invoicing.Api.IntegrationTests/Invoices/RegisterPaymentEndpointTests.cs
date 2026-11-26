@@ -128,7 +128,7 @@ public class RegisterPaymentEndpointTests(WebApplicationFactory<Program> factory
         var customer = await db.Customers.FirstAsync();
 
         var invoice = Invoice.CreateNew(customer,
-            [new InvoiceItem { Description = "Service", Quantity = 1, UnitPrice = totalAmount }]);
+            [new InvoiceLine("Service", 1, totalAmount)]);
         db.Invoices.Add(invoice);
         await db.SaveChangesAsync();
         return invoice.Id;

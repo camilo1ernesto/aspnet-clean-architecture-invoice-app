@@ -6,26 +6,25 @@ namespace Invoicing.Domain.Invoices;
 public class Invoice : BaseEntity
 {
     private readonly List<Payment> _payments = [];
+    private readonly List<InvoiceItem> _items = [];
 
-    public Customer Customer { get; set; } = default!;
+    public Customer Customer { get; private set; } = default!;
     public DateTime DueAt { get; private set; }
     public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
     public DateTime SentAt { get; private set; }
     public InvoiceStatus Status { get; private set; } = InvoiceStatus.Unpaid;
-    public List<InvoiceItem> Items { get; set; } = [];
+    public IReadOnlyCollection<InvoiceItem> Items => _items.AsReadOnly();
     public IReadOnlyCollection<Payment> Payments => _payments.AsReadOnly();
 
     public decimal TotalAmount => Items.Sum(i => i.TotalPrice);
     public decimal AmountPaid => _payments.Sum(p => p.Amount);
     public decimal OutstandingBalance => TotalAmount - AmountPaid;
 
-    public static Invoice CreateNew(Customer customer, List<InvoiceItem> items)
+    public static Invoice CreateNew(Customer customer, IEnumerable<InvoiceLine> lines)
     {
-        var invoice = new Invoice
-        {
-            Customer = customer,
-            Items = items
-        };
+        var invoice = new Invoice { Customer = customer };
+        foreach (var line in lines)
+            invoice._items.Add(new InvoiceItem(line.Description, line.Quantity, line.UnitPrice));
         return invoice;
     }
 
@@ -58,6 +57,9 @@ public class Invoice : BaseEntity
 
     public void MarkAsSent()
     {
+        if (Status != InvoiceStatus.Unpaid)
+            throw new DomainException(InvoiceErrors.InvoiceAlreadySent,
+                "Invoice has already been sent.");
         Status = InvoiceStatus.Sent;
         SentAt = DateTime.UtcNow;
         DueAt = DateTime.UtcNow.AddMonths(1);

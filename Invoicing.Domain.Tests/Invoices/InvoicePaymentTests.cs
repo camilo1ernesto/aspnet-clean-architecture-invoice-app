@@ -12,8 +12,8 @@ public class InvoicePaymentTests
     private static Invoice CreateInvoice() =>
         Invoice.CreateNew(new Customer("John Doe", "johndoe@example.com"),
         [
-            new InvoiceItem { Description = "Service", Quantity = 2, UnitPrice = 30m },
-            new InvoiceItem { Description = "Support", Quantity = 1, UnitPrice = 40m }
+            new InvoiceLine("Service", 2, 30m),
+            new InvoiceLine("Support", 1, 40m)
         ]);
 
     [Fact]

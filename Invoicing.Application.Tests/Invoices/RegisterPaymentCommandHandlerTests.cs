@@ -19,7 +19,7 @@ public class RegisterPaymentCommandHandlerTests
 
         // Total = 100
         _invoice = Invoice.CreateNew(new Customer("John Doe", "johndoe@example.com"),
-            [new InvoiceItem { Description = "Service", Quantity = 1, UnitPrice = 100m }]);
+            [new InvoiceLine("Service", 1, 100m)]);
         _repository.Invoices.Add(_invoice);
     }
 

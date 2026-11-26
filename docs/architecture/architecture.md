@@ -42,7 +42,7 @@ Contains the core business model:
 - entities and aggregate roots (`Invoice` is the aggregate root for its `InvoiceItem`s);
 - value objects where a concept is defined by its value rather than identity;
 - business invariants, enforced by the entities themselves;
-- domain behaviour (for example invoice creation and status transitions such as `MarkAsSent`, `MarkAsPaid`);
+- domain behaviour (for example invoice creation and status transitions such as `MarkAsSent` and `RegisterPayment`);
 - domain events, only where a domain occurrence must be observed outside the aggregate.
 
 Rules:
@@ -250,11 +250,9 @@ Recorded at baseline. Each should be resolved or covered by an ADR.
 | Rule(s) | Deviation | Location |
 |---------|-----------|----------|
 | API-6, BND-3 | `mediator.Send` is not awaited in `POST /invoices`; the response contains a `Task`, not the ID, and the use case runs after the response is returned. | `Invoicing.Api/Invoices/InvoiceApi.cs` |
-| API-4, APP-4 | Api constructs `InvoiceItem` domain entities; `CreateInvoiceCommand` takes `List<InvoiceItem>`. | `InvoiceApi.cs`, `CreateInvoiceCommand.cs` |
 | INF-5, PER-3 | `IUnitOfWork` is registered as a separate `ApplicationDbContext` instance from the one repositories use. | `Invoicing.Infrastructure/DependencyInjection.cs` |
-| DOM-2, DOM-5 | `Invoice.Customer`, `Items` and all `InvoiceItem` properties are publicly settable; `Items` is a mutable `List`. (`Status` is private and `Payments` is read-only since SPEC-001.) | `Invoice.cs`, `InvoiceItem.cs` |
-| DOM-3 | No invariants enforced on invoice creation (empty items, non-positive quantity, negative price). | `Invoice.cs`, `InvoiceItem.cs` |
-| DOM-2 | `MarkAsSent` has no preconditions; `Overdue` is never assigned. (`Paid` is reached only through `RegisterPayment` since SPEC-001.) | `Invoice.cs` |
+| DOM-3 | An invoice can be created with no items (a zero-total invoice can never become `Paid`). Item invariants (description, quantity, price) are enforced. | `Invoice.cs` |
+| DOM-2 | `Overdue` is never assigned. | `Invoice.cs` |
 | DOM-6 | `Invoice` references the `Customer` object rather than its identity. | `Invoice.cs` |
 | API-7, BND-5 | Create-invoice raises `ArgumentException` for a missing customer, outside the ADR-003 convention (would surface as 500). | `CreateInvoiceCommandHandler.cs` |
 | APP-7 | `ICustomerRepository` methods and `IInvoiceRepository.GetAllAsync` do not accept `CancellationToken`. | `ICustomerRepository.cs`, `IInvoiceRepository.cs` |

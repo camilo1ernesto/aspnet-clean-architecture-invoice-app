@@ -6,4 +6,6 @@ namespace Invoicing.Application;
 
 public record CreateInvoiceCommand(
     Guid CustomerId,
-    List<InvoiceItem> Items) : IRequest<Guid>;
+    IReadOnlyList<CreateInvoiceLine> Items) : IRequest<Guid>;
+
+public record CreateInvoiceLine(string Description, int Quantity, decimal UnitPrice);
